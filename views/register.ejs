@@ -1,1 +1,56 @@
 
+<div class="ui two column centered grid">
+    <div class="six wide column">
+        <div class="ui form error" >
+            <div class="field">
+              <label>E-mail</label>
+              <input type="email" placeholder="joe@schmoe.com" class="email"/>
+            </div>
+            <div class="field">
+              <label>Full name</label>
+              <input type="text" placeholder="john doe" class="username"/>
+            </div>
+            <div class="field">
+              <label>Password</label>
+              <input type="password" class="password">
+            </div>
+            <div class="field">
+              <label>Confrim password</label>
+              <input type="password" class="confirmPassword">
+            </div>
+          </div>
+          
+            <div class="ui error message">
+              <div class="header">Action Forbidden</div>
+              <p class="messageHolder">You can only sign up for an account once with a given e-mail address.</p>
+            </div>
+            <div class="ui submit button">Submit</div>
+          </div>
+    </div>
+</div>
+
+<script>
+    $(document).ready(function () {
+    $(".message").hide()
+    $(".submit").click( async ev => {
+        $(".submit").addClass("loading")
+        const data = {
+            email: $(".email")[0].value,
+            username : $(".username")[0].value,
+            password: $(".password")[0].value,
+            confirmPassword: $(".confirmPassword")[0].value
+        }
+        $.post("/auth/signup", data)
+            .then(response => {
+                localStorage.token = response.token
+                $(location).attr('href',"/")
+            }).catch(err => {
+
+                $(".message").show()
+                $(".messageHolder").text(err.responseJSON.message)
+                $(".submit").removeClass("loading")
+            });
+        
+    })
+})
+</script>
