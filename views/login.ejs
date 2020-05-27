@@ -1,0 +1,47 @@
+
+<div class="ui two column centered grid">
+    <div class="six wide column">
+        <div class="ui form error" >
+            <div class="field">
+              <label>E-mail</label>
+              <input type="email" placeholder="joe@schmoe.com" class="email"/>
+            </div>
+            
+            <div class="field">
+              <label>Password</label>
+              <input type="password" class="password">
+            </div>
+          </div>
+          
+            <div class="ui error message">
+              <div class="header">Action Forbidden</div>
+              <p class="messageHolder"></p>
+            </div>
+            <div class="ui submit button">Login</div>
+          </div>
+    </div>
+</div>
+
+<script>
+    $(document).ready(function () {
+    $(".message").hide()
+    $(".submit").click( async ev => {
+        $(".submit").addClass("loading")
+        const data = {
+            email: $(".email")[0].value,
+            password: $(".password")[0].value,
+        }
+        $.post("/auth/login", data)
+            .then(response => {
+                localStorage.token = response.token
+                $(location).attr('href',"/")
+            }).catch(err => {
+
+                $(".message").show()
+                $(".messageHolder").text(err.responseJSON.message)
+                $(".submit").removeClass("loading")
+            });
+        
+    })
+})
+</script>
