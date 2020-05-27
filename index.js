@@ -5,6 +5,9 @@ import expressLayout from "express-ejs-layouts";
 import flash from "connect-flash";
 import session from "express-session";
 import passport from "passport";
+import { sequelize } from "./models";
+import passportConfig from "./config/passport";
+import router from "./routes";
 
 config();
 
@@ -27,7 +30,7 @@ app.use(
 );
 
 // Passport config
-// require("./config/passport")(passport);
+passportConfig(passport);
 
 // Passport middleware
 app.use(passport.initialize());
@@ -45,8 +48,25 @@ app.use((req, res, next) => {
 });
 
 const PORT = process.env.PORT || 500;
+
+app.use("/assets", express.static("public"));
 app.get("/", (req, res) => {
   res.json({ response: true });
 });
 
-app.listen(PORT, console.log(`Server started on port ${PORT}`));
+app.use(router);
+
+sequelize
+  .sync({ force: false })
+  .then(() => {
+    app.listen(PORT, () => {
+      // eslint-disable-next-line no-console
+      console.log(
+        `Server listening on port: ${PORT} in ${process.env.NODE_ENV} mode`
+      );
+    });
+  })
+  .catch((err) => {
+    // eslint-disable-next-line no-console
+    console.log(`Unable to connect to the databse ${err}`);
+  });
