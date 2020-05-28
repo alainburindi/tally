@@ -2,7 +2,46 @@
   <div class="item">
     <img src="/assets/images/tally.png" />
   </div>
-  <a class="item">Home</a>
-  <a class="blue item">Signup</a>
-  <a class="item">Signin</a>
+  <a class="item" href="/">Home</a>
 </div>
+
+<script>
+  const token = localStorage.getItem("token");
+  const setupUnauthorized = () => {
+    const links = `<a class="item" href="/auth/signup">Signup</a>
+  <a class="item" href="/auth/login">Signin</a>`;
+    $(".menu").append(links);
+  };
+  const denyAccessToAuthRoutes = () => {
+    if ($(location)[0].pathname == "/auth/profile")
+      $(location).attr("href", "/auth/login");
+  };
+
+  if (token) {
+    $.ajax({
+      url: "/auth/user",
+      headers: { Authorization: token },
+    })
+      .then((response) => {
+        const auhorizedContent = `
+        <a class="item" href="/auth/profile">Profile</a>
+        <div class="right menu">
+          <div class="item">
+            <div class="ui primary button">Create</div>
+          </div>
+          <a class="item">Sign out</a>
+        </div>
+        `;
+        localStorage.setItem("email", response.user.email);
+        $(".menu").append(auhorizedContent);
+      })
+      .catch(() => {
+        localStorage.removeItem("token");
+        setupUnauthorized();
+        denyAccessToAuthRoutes();
+      });
+  } else {
+    setupUnauthorized();
+    denyAccessToAuthRoutes();
+  }
+</script>
