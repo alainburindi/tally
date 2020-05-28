@@ -3,6 +3,39 @@
     <img src="/assets/images/tally.png" />
   </div>
   <a class="item">Home</a>
-  <a class="blue item">Signup</a>
-  <a class="item">Signin</a>
 </div>
+
+<script>
+  const token = localStorage.getItem("token");
+  let user = undefined;
+  const setupUnauthorized = () => {
+    const links = `<a class="item">Signup</a>
+  <a class="item">Signin</a>`;
+    $(".menu").append(links);
+  };
+  if (token) {
+    $.ajax({
+      url: "/auth/user",
+      headers: { Authorization: token },
+    })
+      .then((response) => {
+        const auhorizedContent = `
+        <a class="item">Profile</a>
+        <div class="right menu">
+          <div class="item">
+            <div class="ui primary button">Create</div>
+          </div>
+          <a class="item">Sign out</a>
+        </div>
+        `;
+        user = response.user;
+        $(".menu").append(auhorizedContent);
+      })
+      .catch(() => {
+        localStorage.removeItem("token");
+        setupUnauthorized();
+      });
+  } else {
+    setupUnauthorized();
+  }
+</script>
