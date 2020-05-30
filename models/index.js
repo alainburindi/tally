@@ -12,6 +12,8 @@ const sequelize = new Sequelize(DB_NAME, DB_USER, DB_PASSWORD, {
 
 const models = {
   User: sequelize.import("./user"),
+  Vote: sequelize.import("./vote"),
+  Choice: sequelize.import("./choice"),
 };
 
 Object.keys(models).forEach((key) => {

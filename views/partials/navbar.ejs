@@ -5,6 +5,39 @@
   <a class="item" href="/">Home</a>
 </div>
 
+<div class="ui modal">
+  <i class="close icon"></i>
+  <div class="header">
+    Create a vote
+  </div>
+  <form class="ui large form error">
+    <div class="ui segment">
+      <div class="field">
+        <label for="">Name</label>
+        <div class="ui left input">
+          <input type="text" name="name" placeholder="Vote name" class="name" />
+        </div>
+      </div>
+      <div class="field">
+        <label for="">Choices (separated by comma)</label>
+        <div class="ui left input">
+          <input
+            type="text"
+            name="password"
+            placeholder="eg: choice 1, choice 2"
+            class="choices"
+          />
+        </div>
+      </div>
+      <div class="ui error message messageDiv">
+        <div class="header">Action Forbidden</div>
+        <p class="messageHolder"></p>
+      </div>
+      <div class="ui fluid large primary button create-vote">Create</div>
+    </div>
+  </form>
+</div>
+
 <script>
   const token = localStorage.getItem("token");
   const setupUnauthorized = () => {
@@ -27,13 +60,15 @@
         <a class="item" href="/auth/profile">Profile</a>
         <div class="right menu">
           <div class="item">
-            <div class="ui primary button">Create</div>
+            <div class="ui primary button create">Create</div>
           </div>
           <a class="item">Sign out</a>
         </div>
         `;
-        localStorage.setItem("email", response.user.email);
         $(".menu").append(auhorizedContent);
+        $(".create").click((ev) => {
+          $(".ui.modal").modal("show");
+        });
       })
       .catch(() => {
         localStorage.removeItem("token");
@@ -44,4 +79,28 @@
     setupUnauthorized();
     denyAccessToAuthRoutes();
   }
+
+  $(".messageDiv").hide();
+  $(".create-vote").click(async (ev) => {
+    $(".create-vote").addClass("loading");
+    const data = {
+      name: $(".name")[0].value,
+      choices: $(".choices")[0].value.split(","),
+    };
+    $.ajax({
+      url: "/vote",
+      method: "POST",
+      data: data,
+      headers: { Authorization: localStorage.getItem("token") },
+    })
+      .then((response) => {
+        console.log(response); // to be replaced with redirection
+        $(".create-vote").removeClass("loading");
+      })
+      .catch((err) => {
+        $(".messageDiv").show();
+        $(".messageHolder").text(err.responseJSON.message);
+        $(".create-vote").removeClass("loading");
+      });
+  });
 </script>
