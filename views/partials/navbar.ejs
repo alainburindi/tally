@@ -94,8 +94,8 @@
       headers: { Authorization: localStorage.getItem("token") },
     })
       .then((response) => {
-        console.log(response); // to be replaced with redirection
         $(".create-vote").removeClass("loading");
+        $(location).attr("href", `/vote/${response.vote.id}`);
       })
       .catch((err) => {
         $(".messageDiv").show();

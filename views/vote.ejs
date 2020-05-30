@@ -1,0 +1,107 @@
+<div class="ui grid">
+  <div class="six wide column">
+    <form class="ui large form">
+      <div class="ui segment">
+        <div class="field">
+          <label for="">Your choice</label>
+          <div class="ui left input">
+            <select class="ui dropdown">
+              <option value="" disabled selected>Choose</option>
+            </select>
+          </div>
+        </div>
+        <div class="ui disabled fluid large primary button submit-vote">
+          Vote
+        </div>
+      </div>
+    </form>
+
+    <!-- <div class="ui column">
+      <div class="ui fluid large primary button">
+        Share
+      </div>
+    </div> -->
+  </div>
+
+  <div
+    class="ten wide column"
+    id="chartContainer"
+    style="height: 370px; width: 100%;"
+  ></div>
+</div>
+
+<script>
+  const currentLocation = $(location)[0].pathname;
+  const renderChart = (data) => {
+    const dataPoints = [];
+    for (const vote of data.Choices) {
+      if (vote.votes) dataPoints.push({ y: vote.votes, label: vote.name });
+    }
+
+    var chart = new CanvasJS.Chart("chartContainer", {
+      theme: "light2", // "light1", "light2", "dark1", "dark2"
+      exportEnabled: true,
+      animationEnabled: true,
+      title: {
+        text: data.name,
+      },
+
+      data: [
+        {
+          type: "pie",
+          startAngle: 25,
+          toolTipContent: "<b>{label}</b>: {y}",
+          indexLabel: dataPoints.length > 0 ? "{label} - {y}" : "",
+          showInLegend: "true",
+          legendText: "{label}",
+          indexLabelFontSize: 16,
+          dataPoints:
+            dataPoints.length > 0 ? dataPoints : [{ y: 1, label: "no vote" }],
+        },
+      ],
+    });
+    chart.render();
+  };
+
+  const addOptions = (choices) => {
+    let options = "";
+    for (const choice of choices) {
+      options += `<option value=${choice.id}>${choice.name}</option>`;
+    }
+    $(".dropdown").append(options);
+  };
+  $.ajax({
+    url: `/vote/single/${currentLocation.replace("/vote/", "")}`,
+    headers: { Authorization: token },
+  })
+    .then((response) => {
+      renderChart(response.vote);
+      addOptions(response.vote.Choices);
+    })
+    .catch((err) => {
+      $(location).attr("href", "/");
+    });
+
+  let selectedValue = undefined;
+
+  $(".dropdown").change((e) => {
+    $(".submit-vote").removeClass("disabled");
+    selectedValue = e.target.value;
+  });
+
+  $(".submit-vote").click(() => {
+    $(".submit-vote").addClass("loading");
+    $.ajax({
+      method: "POST",
+      url: `/vote/submit`,
+      headers: { Authorization: token },
+      data: { id: selectedValue },
+    })
+      .then((response) => {
+        $(location).attr("href", currentLocation);
+      })
+      .catch((err) => {
+        $(".submit-vote").removeClass("loading");
+      });
+  });
+</script>
