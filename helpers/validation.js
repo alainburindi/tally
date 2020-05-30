@@ -20,4 +20,13 @@ const validateLogin = (data) => {
   return schema.validate(data);
 };
 
-export { validateSignup, validateLogin };
+const validateVote = (data) => {
+  const schema = Joi.object({
+    name: Joi.string().trim().required(),
+    choices: Joi.array().required(),
+  });
+
+  return schema.validate(data);
+};
+
+export { validateSignup, validateLogin, validateVote };
