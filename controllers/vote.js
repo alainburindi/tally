@@ -29,10 +29,14 @@ const viewVote = async (req, res) => {
     where: { id: req.params.id },
     include: [Choice],
   });
+  vote.isOwner = req.user ? req.user.id == vote.userId : false;
 
   if (!vote) return sendResponse(res, 404, "vote not found");
 
-  return sendResponse(res, 200, "voute found", { vote: vote });
+  return sendResponse(res, 200, "voute found", {
+    vote: vote,
+    isOwner: req.user?.id == vote.userId,
+  });
 };
 
 const submitChoice = async (req, res) => {

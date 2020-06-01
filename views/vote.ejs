@@ -16,11 +16,11 @@
       </div>
     </form>
 
-    <!-- <div class="ui column">
-      <div class="ui fluid large primary button">
-        Share
-      </div>
-    </div> -->
+    <div
+      class="ui column share"
+      style="margin-top: 30px; margin-left: 105px;"
+    ></div>
+    <div class="ui column delete-container" style="margin-top: 30px;"></div>
   </div>
 
   <div
@@ -69,12 +69,42 @@
       options += `<option value=${choice.id}>${choice.name}</option>`;
     }
     $(".dropdown").append(options);
+
+    const shareLinks = `
+    <a
+        class="ui facebook button"
+        href="https://www.facebook.com/sharer/sharer.php?u=${
+          $(location)[0].href
+        }"
+        target="_blank"
+        style="background-color: #4267b2; color: white;"
+      >
+        <i class="facebook icon"></i>
+        Share on facebook
+      </a>
+      <a
+        class="ui twitter button"
+        href="https://twitter.com/intent/tweet?text=${$(location)[0].href}"
+        target="_blank"
+        style="background-color: #00acee; color: white;"
+      >
+        <i class="twitter icon"></i>
+        Share on twitter
+      </a>`;
+
+    $(".share").append(shareLinks);
   };
   $.ajax({
     url: `/vote/single/${currentLocation.replace("/vote/", "")}`,
     headers: { Authorization: token },
   })
     .then((response) => {
+      if (response.isOwner) {
+        $(".delete-container").append(`
+      <div class="ui fluid large red button">
+        Delete
+      </div>`);
+      }
       renderChart(response.vote);
       addOptions(response.vote.Choices);
     })
