@@ -15,6 +15,7 @@ const vote = (sequelize, DataTypes) => {
 
   Vote.associate = (models) => {
     Vote.belongsTo(models.User, { foreignKey: "userId" });
+    Vote.hasMany(models.Choice);
   };
 
   return Vote;

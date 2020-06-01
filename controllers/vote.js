@@ -24,4 +24,27 @@ const createVote = async (req, res) => {
   return sendResponse(res, 201, "vote created", { vote: vote });
 };
 
-export { createVote };
+const viewVote = async (req, res) => {
+  const vote = await Vote.findOne({
+    where: { id: req.params.id },
+    include: [Choice],
+  });
+  vote.isOwner = req.user ? req.user.id == vote.userId : false;
+
+  if (!vote) return sendResponse(res, 404, "vote not found");
+
+  return sendResponse(res, 200, "voute found", {
+    vote: vote,
+    isOwner: req.user?.id == vote.userId,
+  });
+};
+
+const submitChoice = async (req, res) => {
+  const { id } = req.body;
+  const choice = await Choice.findByPk(id);
+  if (!choice) return sendResponse(res, 400, "Invalid choice");
+  choice.votes += 1;
+  await choice.save();
+  return sendResponse(res, 200, "choice submitted successfully");
+};
+export { createVote, viewVote, submitChoice };
