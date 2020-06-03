@@ -6,7 +6,7 @@
 
 <script>
   $.ajax({
-    url: "/vote/u/mine",
+    url: "/rest/vote/user/all",
     headers: { Authorization: token },
   })
     .then((response) => {
