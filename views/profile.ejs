@@ -1,61 +1,40 @@
 <div class="ui centered grid">
   <div class="twelve wide column">
-    <div class="ui cards">
-      <div class="card">
-        <div class="content">
-          <div class="header">Poll name</div>
-          <div class="meta">
-            <span>Option 1</span>
-            <span>Option 2</span>
-          </div>
-        </div>
-      </div>
-      <div class="card">
-        <div class="content">
-          <div class="header">Poll name</div>
-          <div class="meta">
-            <span>Option 1</span>
-            <span>Option 2</span>
-          </div>
-        </div>
-      </div>
-      <div class="card">
-        <div class="content">
-          <div class="header">Poll name</div>
-          <div class="meta">
-            <span>Option 1</span>
-            <span>Option 2</span>
-          </div>
-        </div>
-      </div>
-      <div class="card">
-        <div class="content">
-          <div class="header">Poll name</div>
-          <div class="meta">
-            <span>Option 1</span>
-          </div>
-        </div>
-      </div>
-      <div class="card">
-        <div class="content">
-          <div class="header">Poll name</div>
-          <div class="meta">
-            <span>Option 1</span>
-            <span>Option 2</span>
-          </div>
-        </div>
-      </div>
-      <div class="card">
-        <div class="content">
-          <div class="header">Poll name</div>
-          <div class="meta">
-            <span>Option 1</span>
-            <span>Option 2</span>
-          </div>
-        </div>
-      </div>
-    </div>
+    <div class="ui cards"></div>
   </div>
 </div>
 
-<script></script>
+<script>
+  $.ajax({
+    url: "/vote/u/mine",
+    headers: { Authorization: token },
+  })
+    .then((response) => {
+      for (const vote of response.votes) {
+        let options = "";
+        for (const choice of vote.Choices) {
+          options += `<span>${choice.name}</span>`;
+        }
+        const voteCard = `
+      <div class="card" style="width: 370px;">
+        <div class="content">
+          <a class="header" href="/vote/${vote.id}">${vote.name}</a>
+          <div class="meta option-${vote.id}">
+            ${options}
+          </div>
+        </div>
+      </div>
+      `;
+        $(".cards").append(voteCard);
+      }
+    })
+    .catch((err) => {
+      $(".column").append(`
+      <div class="ui message warning">
+  <div class="header">
+    No votes found
+  </div>
+  <p>You haven't created any vote so far. Please use  the create button</p>
+</div>`);
+    });
+</script>
