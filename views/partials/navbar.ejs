@@ -40,6 +40,7 @@
 
 <script>
   const token = localStorage.getItem("token");
+  const currentLocation = $(location)[0].pathname;
   const setupUnauthorized = () => {
     const links = `<a class="item" href="/auth/signup">Signup</a>
   <a class="item" href="/auth/login">Signin</a>`;
@@ -50,9 +51,14 @@
       $(location).attr("href", "/auth/login");
   };
 
+  const denyAccessToLoginOrSignup = () => {
+    if (currentLocation == "/auth/login" || currentLocation == "/auth/signup")
+      $(location).attr("href", "/auth/profile");
+  };
+
   if (token) {
     $.ajax({
-      url: "/auth/user",
+      url: "/rest/auth",
       headers: { Authorization: token },
     })
       .then((response) => {
@@ -62,13 +68,19 @@
           <div class="item">
             <div class="ui primary button create">Create</div>
           </div>
-          <a class="item">Sign out</a>
+          <a class="item logout">Sign out</a>
         </div>
         `;
         $(".menu").append(auhorizedContent);
-        $(".create").click((ev) => {
+        $(".button.create").click((ev) => {
           $(".ui.modal.create").modal("show");
         });
+
+        $(".logout").click(() => {
+          localStorage.removeItem("token");
+          $(location).attr("href", "/");
+        });
+        denyAccessToLoginOrSignup();
       })
       .catch(() => {
         localStorage.removeItem("token");
@@ -88,7 +100,7 @@
       choices: $(".choices")[0].value.split(","),
     };
     $.ajax({
-      url: "/vote",
+      url: "/rest/vote",
       method: "POST",
       data: data,
       headers: { Authorization: localStorage.getItem("token") },

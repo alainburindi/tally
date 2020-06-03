@@ -6,13 +6,11 @@
 
 <script>
   $.ajax({
-    url: "/vote/tally/all",
+    url: "/rest/vote/get/all",
     headers: { Authorization: token },
   }).then((response) => {
-    console.log(response);
-
     if (!response.votes?.length) {
-      const isLoggedIn = $(".create").length;
+      const isLoggedIn = $(".button.create").length;
       $(".column").append(`
         <div class="ui message warning">
           <div class="header">

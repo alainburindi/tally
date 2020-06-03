@@ -3,12 +3,19 @@ import { config } from "dotenv";
 
 config();
 
-const { DB_USER, DB_PASSWORD, DB_NAME, DB_HOST, NODE_ENV } = process.env;
+const {
+  DB_USER,
+  DB_PASSWORD,
+  DB_NAME,
+  DB_HOST,
+  NODE_ENV,
+  DB_DIALECT,
+} = process.env;
 
 const sequelize = new Sequelize(DB_NAME, DB_USER, DB_PASSWORD, {
   host: DB_HOST,
-  dialect: "mysql",
-  logging: NODE_ENV != "stagging",
+  dialect: DB_DIALECT,
+  logging: NODE_ENV != "staging",
 });
 
 const models = {

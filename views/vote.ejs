@@ -119,7 +119,7 @@
     $(".share").append(shareLinks);
   };
   $.ajax({
-    url: `/vote/single/${currentLocation.replace("/vote/", "")}`,
+    url: `/rest/vote/${currentLocation.replace("/vote/", "")}`,
     headers: { Authorization: token },
   })
     .then((response) => {
@@ -135,7 +135,6 @@
 
         $(".delete-confirm").click((e) => {
           e.preventDefault();
-          console.log(idToDelete);
           deleteVote();
         });
 
@@ -165,7 +164,7 @@
     $(".submit-vote").addClass("loading");
     $.ajax({
       method: "POST",
-      url: `/vote/submit`,
+      url: "/rest/vote/submit",
       headers: { Authorization: token },
       data: { id: selectedValue },
     })
@@ -181,7 +180,7 @@
     $(".cancel, .ok").addClass("loading disabled");
     $.ajax({
       method: "DELETE",
-      url: `/vote`,
+      url: "/rest/vote",
       headers: { Authorization: token },
       data: { id: idToDelete },
     })
