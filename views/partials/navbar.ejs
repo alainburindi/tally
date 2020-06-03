@@ -5,7 +5,7 @@
   <a class="item" href="/">Home</a>
 </div>
 
-<div class="ui modal">
+<div class="ui modal create">
   <i class="close icon"></i>
   <div class="header">
     Create a vote
@@ -67,7 +67,7 @@
         `;
         $(".menu").append(auhorizedContent);
         $(".create").click((ev) => {
-          $(".ui.modal").modal("show");
+          $(".ui.modal.create").modal("show");
         });
       })
       .catch(() => {

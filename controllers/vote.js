@@ -29,7 +29,6 @@ const viewVote = async (req, res) => {
     where: { id: req.params.id },
     include: [Choice],
   });
-  vote.isOwner = req.user ? req.user.id == vote.userId : false;
 
   if (!vote) return sendResponse(res, 404, "vote not found");
 
@@ -41,10 +40,41 @@ const viewVote = async (req, res) => {
 
 const submitChoice = async (req, res) => {
   const { id } = req.body;
+  if (!id) return sendResponse(res, 400, "the choice id is required");
+
   const choice = await Choice.findByPk(id);
   if (!choice) return sendResponse(res, 400, "Invalid choice");
   choice.votes += 1;
   await choice.save();
   return sendResponse(res, 200, "choice submitted successfully");
 };
-export { createVote, viewVote, submitChoice };
+
+const deleteVote = async (req, res) => {
+  const { id } = req.body;
+
+  const vote = await Vote.findOne({
+    where: { id, userId: req.user.id },
+  });
+
+  if (!vote) return sendResponse(res, 404, "vote not found");
+
+  await Choice.destroy({ where: { VoteId: id } });
+
+  await Vote.destroy({ where: { id } });
+
+  return sendResponse(res, 200, "deleted successfully");
+};
+
+const getUserVotes = async (req, res) => {
+  const votes = await Vote.findAll({
+    where: { userId: req.user.id },
+    include: [Choice],
+  });
+
+  if (!votes)
+    return sendResponse(res, 404, "you haven't created any vote so far");
+
+  return sendResponse(res, 200, "Your posts", { votes });
+};
+
+export { createVote, viewVote, submitChoice, deleteVote, getUserVotes };

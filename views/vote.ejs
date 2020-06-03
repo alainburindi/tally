@@ -28,10 +28,34 @@
     id="chartContainer"
     style="height: 370px; width: 100%;"
   ></div>
+
+  <div class="ui basic modal delete-modal">
+    <div class="ui icon header">
+      <i class="archive icon"></i>
+      Archive The Vote
+    </div>
+    <div class="content">
+      <p style="text-align: center;">
+        Do you really want to delete this vote?
+      </p>
+    </div>
+    <div class="" style="text-align: right;">
+      <div class="ui red basic cancel inverted button">
+        <i class="remove icon"></i>
+        No
+      </div>
+      <div class="ui green ok inverted button delete-confirm">
+        <i class="checkmark icon"></i>
+        Yes
+      </div>
+    </div>
+  </div>
 </div>
 
 <script>
   const currentLocation = $(location)[0].pathname;
+  let idToDelete = undefined;
+
   const renderChart = (data) => {
     const dataPoints = [];
     for (const vote of data.Choices) {
@@ -101,9 +125,27 @@
     .then((response) => {
       if (response.isOwner) {
         $(".delete-container").append(`
-      <div class="ui fluid large red button">
+      <div class="ui fluid large red button delete" id=${response.vote.id}>
         Delete
       </div>`);
+        $(".delete").click((e) => {
+          idToDelete = e.target.id;
+          $(".ui.basic.modal").modal("show");
+        });
+
+        $(".delete-confirm").click((e) => {
+          e.preventDefault();
+          console.log(idToDelete);
+          deleteVote();
+        });
+
+        $(".cancel").click(() => {
+          $("body").removeClass("dimmed");
+          $(".ui.dimmer.modals, .ui.basic.modal").removeClass("visible active");
+          $(".ui.dimmer.modals").removeAttr("style");
+          $(".ui.basic.modal").removeAttr("style");
+          $(".ui.dimmer.modals, .ui.basic.modal").addClass("hidden");
+        });
       }
       renderChart(response.vote);
       addOptions(response.vote.Choices);
@@ -134,4 +176,21 @@
         $(".submit-vote").removeClass("loading");
       });
   });
+
+  const deleteVote = () => {
+    $(".cancel, .ok").addClass("loading disabled");
+    $.ajax({
+      method: "DELETE",
+      url: `/vote`,
+      headers: { Authorization: token },
+      data: { id: idToDelete },
+    })
+      .then((response) => {
+        $(".cancel, .ok").removeClass("loading disabled");
+        $(location).attr("href", "/auth/profile");
+      })
+      .catch((err) => {
+        $(location).attr("href", "/auth/profile");
+      });
+  };
 </script>
