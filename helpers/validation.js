@@ -23,7 +23,7 @@ const validateLogin = (data) => {
 const validateVote = (data) => {
   const schema = Joi.object({
     name: Joi.string().trim().required(),
-    choices: Joi.array().required(),
+    choices: Joi.array().min(2).required(),
   });
 
   return schema.validate(data);

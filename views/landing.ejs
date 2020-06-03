@@ -6,10 +6,25 @@
 
 <script>
   $.ajax({
-    url: "/vote/u/mine",
+    url: "/vote/tally/all",
     headers: { Authorization: token },
-  })
-    .then((response) => {
+  }).then((response) => {
+    console.log(response);
+
+    if (!response.votes?.length) {
+      const isLoggedIn = $(".create").length;
+      $(".column").append(`
+        <div class="ui message warning">
+          <div class="header">
+            Empty votes list
+          </div>
+          <p>No vote has been created so far. ${
+            isLoggedIn
+              ? "Please use  the create button"
+              : "log in and be the first to create a vote"
+          }</p>
+        </div>`);
+    } else {
       for (const vote of response.votes) {
         let options = "";
         for (const choice of vote.Choices) {
@@ -27,14 +42,6 @@
       `;
         $(".cards").append(voteCard);
       }
-    })
-    .catch((err) => {
-      $(".column").append(`
-        <div class="ui message warning">
-          <div class="header">
-            Empty votes list
-          </div>
-          <p>You haven't created any vote so far. Please use  the create button</p>
-        </div>`);
-    });
+    }
+  });
 </script>

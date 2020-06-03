@@ -51,7 +51,7 @@ const PORT = process.env.PORT || 500;
 
 app.use("/assets", express.static("public"));
 app.get("/", (req, res) => {
-  res.json({ response: true });
+  res.render("landing");
 });
 
 app.use(router);
