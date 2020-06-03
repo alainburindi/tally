@@ -74,7 +74,12 @@ const getUserVotes = async (req, res) => {
   if (!votes)
     return sendResponse(res, 404, "you haven't created any vote so far");
 
-  return sendResponse(res, 200, "Your posts", { votes });
+  return sendResponse(res, 200, "Your Votes", { votes });
 };
 
-export { createVote, viewVote, submitChoice, deleteVote, getUserVotes };
+const getAll = async (req, res) => {
+  const votes = await Vote.findAll({ include: [Choice] });
+  return sendResponse(res, 200, " Votes list", { votes });
+};
+
+export { createVote, viewVote, submitChoice, deleteVote, getUserVotes, getAll };
