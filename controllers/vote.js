@@ -17,7 +17,7 @@ const createVote = async (req, res) => {
   for (const choice of value.choices) {
     await Choice.create({
       name: choice,
-      voteId: vote.id,
+      VoteId: vote.dataValues.id,
     });
   }
 
