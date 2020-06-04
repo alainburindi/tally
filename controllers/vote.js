@@ -15,10 +15,11 @@ const createVote = async (req, res) => {
   });
 
   for (const choice of value.choices) {
-    await Choice.create({
+    const c = await Choice.create({
       name: choice,
-      voteId: vote.id,
+      VoteId: vote.dataValues.id,
     });
+    console.log(c.dataValues, vote.id);
   }
 
   return sendResponse(res, 201, "vote created", { vote: vote });
@@ -29,6 +30,7 @@ const viewVote = async (req, res) => {
     where: { id: req.params.id },
     include: [Choice],
   });
+  const choices = await Choice.findAll();
 
   if (!vote) return sendResponse(res, 404, "vote not found");
 

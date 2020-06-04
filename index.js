@@ -27,7 +27,7 @@ app.get("/", (req, res) => {
 app.use(router);
 
 sequelize
-  .sync({ force: false })
+  .sync({ force: true })
   .then(() => {
     app.listen(PORT, () => {
       console.log(
